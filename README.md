@@ -27,16 +27,20 @@
 └─ source_codex_maxxing26.pdf
 ```
 
-更详细的目录职责见 [docs/PROJECT_STRUCTURE.md](/C:/Users/kaodanzi/.codex/worktrees/8873/codex生成/docs/PROJECT_STRUCTURE.md:1)。
+更详细的目录职责见 [docs/PROJECT_STRUCTURE.md](/D:/codex生成/docs/PROJECT_STRUCTURE.md:1)。
 
 ## 主要文件
 
 - `scripts/translate_pdf_preserve_layout.py`
-  - 主脚本，负责抽取文本块、生成翻译、应用润色规则、渲染覆盖层并合成最终 PDF
+  - 核心处理脚本，负责抽取文本块、生成翻译、应用润色规则、渲染覆盖层并合成最终 PDF
+- `scripts/translate_pdf_cli.py`
+  - 命令行入口脚本，负责接收输入/输出/缓存等参数并调用主处理脚本
 - `scripts/cn_polish_overrides.json`
   - 中文标题、术语统一和局部人工改写规则
 - `tests/test_translate_pdf_preserve_layout.py`
   - 主脚本关键行为测试
+- `tests/test_translate_pdf_cli.py`
+  - CLI 参数解析与路径重绑定测试
 - `tests/test_cn_polish_overrides.py`
   - 术语覆盖与润色规则测试
 
@@ -44,40 +48,54 @@
 
 ### 1. 准备输入文件
 
-把待处理的英文 PDF 放在仓库根目录，并命名为：
+把待处理的英文 PDF 放在仓库根目录，或在命令行里显式传入路径。
 
-```text
-source_codex_maxxing26.pdf
-```
+### 2. 运行脚本
 
-如果你后续要处理别的文件，建议先修改脚本里的输入输出路径，或者把脚本继续参数化。
+项目当前有两个入口：
 
-### 2. 运行主脚本
+- 核心处理脚本：`scripts/translate_pdf_preserve_layout.py`
+- 推荐入口：`scripts/translate_pdf_cli.py`
+
+最简单的运行方式：
 
 ```powershell
-python .\scripts\translate_pdf_preserve_layout.py
+python .\scripts\translate_pdf_cli.py
 ```
+
+如果要处理其他 PDF，可以显式传参：
+
+```powershell
+python .\scripts\translate_pdf_cli.py `
+  --source-pdf .\input\demo.pdf `
+  --output-pdf .\output\pdf\demo_中文润色增强版.pdf `
+  --tmp-dir .\tmp\pdfs\demo_job `
+  --overrides-json .\scripts\cn_polish_overrides.json `
+  --refresh-translations
+```
+
+命令行参数说明：
+
+- `--source-pdf`：输入 PDF 路径
+- `--output-pdf`：输出 PDF 路径
+- `--tmp-dir`：本次任务的中间文件目录
+- `--overrides-json`：术语和人工润色规则文件
+- `--pdftoppm`：`pdftoppm` 可执行文件路径
+- `--refresh-translations`：忽略已有翻译缓存，重新生成 `translations.json`
 
 ### 3. 查看输出结果
 
-脚本运行后会生成或更新：
+脚本会基于给定输入和配置，生成或更新：
 
 - `tmp/pdfs/codex_cn/blocks.json`
 - `tmp/pdfs/codex_cn/translations.json`
-- `output/pdf/OAI_WhitePaper_Codex-maxxing26_中文翻译版.pdf`
-- `output/pdf/OAI_WhitePaper_Codex-maxxing26_中文润色增强版.pdf`
+- `output/pdf/` 下的结果 PDF
 
 ## 一个最小示例流程
 
 ```powershell
-# 进入项目目录
 cd .\codex生成
-
-# 执行翻译与排版保留流程
-python .\scripts\translate_pdf_preserve_layout.py
-
-# 输出文件位于
-# .\output\pdf\
+python .\scripts\translate_pdf_cli.py
 ```
 
 ## 当前处理流程
@@ -92,13 +110,14 @@ python .\scripts\translate_pdf_preserve_layout.py
 
 - 当前脚本依赖本机可用的 PDF、字体和若干 Python 库环境
 - `tmp/` 下内容属于中间产物，一般不需要提交
-- 如果要扩展到其他 PDF，建议把输入文件名、输出文件名和字体路径参数化
+- 如果后续要扩展到其他 PDF，建议继续把输入文件名、输出文件名和字体路径参数化
 
 ## 测试
 
-当前仓库包含针对主脚本和术语规则的测试文件：
+当前仓库包含针对主脚本、CLI 入口和术语规则的测试文件：
 
 - `tests/test_translate_pdf_preserve_layout.py`
+- `tests/test_translate_pdf_cli.py`
 - `tests/test_cn_polish_overrides.py`
 
 如果本机已经安装 `pytest`，可执行：
@@ -109,4 +128,4 @@ pytest .\tests\
 
 ## License
 
-本项目采用 `GNU General Public License v3.0`，详见 [LICENSE](/C:/Users/kaodanzi/.codex/worktrees/8873/codex生成/LICENSE:1)。
+本项目采用 `GNU General Public License v3.0`，详见 [LICENSE](/D:/codex生成/LICENSE:1)。

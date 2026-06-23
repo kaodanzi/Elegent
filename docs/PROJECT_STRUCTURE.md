@@ -14,6 +14,9 @@
 - `translate_pdf_preserve_layout.py`
   - 项目主处理脚本
   - 负责文本抽取、翻译、术语修正、覆盖层绘制和 PDF 合成
+- `translate_pdf_cli.py`
+  - 命令行入口脚本
+  - 负责接收输入/输出/缓存等参数，并调用主处理脚本
 - `cn_polish_overrides.json`
   - 术语映射、标题替换、重点页面人工润色配置
 - `__pycache__/`
