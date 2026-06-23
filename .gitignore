@@ -1,0 +1,6 @@
+__pycache__/
+.pytest_cache/
+pytest-cache-files-*/
+.git.bak/
+tmp/
+tmp_blocks.json
